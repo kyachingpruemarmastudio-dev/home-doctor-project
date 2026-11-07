@@ -1,0 +1,3 @@
+import type { Metadata } from "next";import "./globals.css";import {Providers} from "@/components/providers";import {Navbar} from "@/components/navbar";
+export const metadata:Metadata={title:"MediNova | Modern Healthcare",description:"A modern patient and clinician healthcare platform."};
+export default function RootLayout({children}:{children:React.ReactNode}){return <html lang="en" suppressHydrationWarning><body><Providers><Navbar/>{children}<footer className="container" style={{padding:"32px 0",borderTop:"1px solid var(--line)",marginTop:50}}><span className="muted">© {new Date().getFullYear()} MediNova · Secure healthcare experience</span></footer></Providers></body></html>}

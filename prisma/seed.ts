@@ -1,0 +1,4 @@
+import {PrismaClient} from "@prisma/client";import {hash} from "bcryptjs";
+const prisma=new PrismaClient();
+async function main(){const passwordHash=await hash("DemoPass123!",12);const doctors=[["Dr. Ayesha Rahman","Cardiology"],["Dr. Farhan Ahmed","Dermatology"],["Dr. Nusrat Jahan","Pediatrics"],["Dr. Samiul Karim","General Medicine"]];for(const [name,specialty] of doctors){const email=name.toLowerCase().replace(/[^a-z]+/g,".")+"@medinova.demo";await prisma.user.upsert({where:{email},update:{},create:{name,email,passwordHash,role:"DOCTOR",specialty,bio:"Committed to compassionate, evidence-informed care."}})}await prisma.user.upsert({where:{email:"patient@medinova.demo"},update:{},create:{name:"Demo Patient",email:"patient@medinova.demo",passwordHash,role:"PATIENT"}});console.log("Seeded demo clinicians and patient. Password: DemoPass123!")}
+main().finally(()=>prisma.$disconnect());

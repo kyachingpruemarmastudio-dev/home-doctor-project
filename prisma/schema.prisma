@@ -1,0 +1,77 @@
+generator client { provider = "prisma-client-js" }
+datasource db { provider = "postgresql" url = env("DATABASE_URL") }
+enum Role { PATIENT DOCTOR ADMIN }
+enum AppointmentStatus { PENDING CONFIRMED COMPLETED CANCELLED }
+model User {
+ id String @id @default(cuid())
+ name String
+ email String @unique
+ emailVerified DateTime?
+ image String?
+ passwordHash String?
+ role Role @default(PATIENT)
+ specialty String?
+ bio String?
+ phone String?
+ dateOfBirth DateTime?
+ isActive Boolean @default(true)
+ createdAt DateTime @default(now())
+ updatedAt DateTime @updatedAt
+ accounts Account[]
+ sessions Session[]
+ patientAppointments Appointment[] @relation("PatientAppointments")
+ doctorAppointments Appointment[] @relation("DoctorAppointments")
+ medicalRecords MedicalRecord[] @relation("PatientRecords")
+}
+model Appointment {
+ id String @id @default(cuid())
+ patientId String
+ doctorId String
+ date DateTime
+ reason String
+ status AppointmentStatus @default(PENDING)
+ notes String?
+ createdAt DateTime @default(now())
+ updatedAt DateTime @updatedAt
+ patient User @relation("PatientAppointments",fields:[patientId],references:[id],onDelete:Cascade)
+ doctor User @relation("DoctorAppointments",fields:[doctorId],references:[id],onDelete:Cascade)
+ @@index([patientId,date])
+ @@index([doctorId,date])
+}
+model MedicalRecord {
+ id String @id @default(cuid())
+ patientId String
+ title String
+ summary String
+ recordDate DateTime @default(now())
+ createdAt DateTime @default(now())
+ patient User @relation("PatientRecords",fields:[patientId],references:[id],onDelete:Cascade)
+ @@index([patientId,recordDate])
+}
+model Account {
+ userId String
+ type String
+ provider String
+ providerAccountId String
+ refresh_token String? @db.Text
+ access_token String? @db.Text
+ expires_at Int?
+ token_type String?
+ scope String?
+ id_token String? @db.Text
+ session_state String?
+ user User @relation(fields:[userId],references:[id],onDelete:Cascade)
+ @@id([provider,providerAccountId])
+}
+model Session {
+ sessionToken String @unique
+ userId String
+ expires DateTime
+ user User @relation(fields:[userId],references:[id],onDelete:Cascade)
+}
+model VerificationToken {
+ identifier String
+ token String @unique
+ expires DateTime
+ @@unique([identifier,token])
+}

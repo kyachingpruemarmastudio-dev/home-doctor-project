@@ -1,0 +1,2 @@
+import {NextResponse} from "next/server";import {prisma} from "@/lib/prisma";
+export async function GET(){const doctors=await prisma.user.findMany({where:{role:"DOCTOR",isActive:true},select:{id:true,name:true,image:true,specialty:true,bio:true},orderBy:{name:"asc"},take:100});return NextResponse.json({doctors})}
